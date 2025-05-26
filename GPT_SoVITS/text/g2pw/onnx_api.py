@@ -23,8 +23,11 @@ from .utils import load_config
 onnxruntime.set_default_logger_severity(3)
 try:
     onnxruntime.preload_dlls()
-except:
+except AttributeError:
+    pass
+except Exception as _:
     traceback.print_exc()
+
 warnings.filterwarnings("ignore")
 
 model_version = "1.1"
