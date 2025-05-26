@@ -88,7 +88,7 @@ class Subfix:
 
     @property
     def max_index(self):
-        return len(self.transcriptions_list) - 1
+        return len(self.transcriptions_list)
 
     def load_list(self, list_path: str):
         with open(list_path, mode="r", encoding="utf-8") as f:
@@ -126,7 +126,7 @@ class Subfix:
         checkboxs = []
         with LOCK:
             for i in range(index, index + self.batch_size):
-                if i <= self.max_index:
+                if i <= self.max_index - 1:
                     audios.append(gr.Audio(value=self.transcriptions_list[i][0]))
                     texts.append(gr.Textbox(value=self.transcriptions_list[i][3], label=self.i18n("Text") + f" {i}"))
                     languages.append(gr.Dropdown(value=self.transcriptions_list[i][2]))
@@ -140,8 +140,10 @@ class Subfix:
 
     def next_page(self, index: int):
         batch_size = self.batch_size
-        max_index = self.max_index - batch_size + 1
-        index = min(index + batch_size, max_index)
+        max_index = self.max_index - batch_size
+        if max_index <= 0:
+            max_index = 1
+        index = min(index + batch_size, max_index - 1)
         return gr.Slider(value=index), *self.change_index(index)
 
     def previous_page(self, index: int):
@@ -151,7 +153,7 @@ class Subfix:
 
     def delete_audio(self, index, *selected):
         delete_index = [i + index for i, _ in enumerate(selected) if _]
-        delete_index = [i for i in delete_index if i < self.max_index]
+        delete_index = [i for i in delete_index if i < self.max_index - 1]
         for idx in delete_index[::-1]:
             self.transcriptions_list.pop(idx)
         self.save_list()
@@ -165,18 +167,18 @@ class Subfix:
             languages = input[len(input) // 2 :]
             if texts is None or languages is None:
                 raise ValueError()
-            for idx in range(index, min(index + batch_size, self.max_index)):
+            for idx in range(index, min(index + batch_size, self.max_index - 1)):
                 self.transcriptions_list[idx][3] = texts[idx - index].strip().strip("\n")
                 self.transcriptions_list[idx][2] = languages[idx - index]
             result = self.save_list()
             if isinstance(result, SubfixErr):
-                gr.Warning(str(result.error), title="Subfix Error")
+                gr.Warning(str(result.error))
                 print(result.tracebacks)
 
     def merge_audio(self, index, *selected):
         batch_size = self.batch_size
         merge_index = [i + index for i, _ in enumerate(selected) if _]
-        merge_index = [i for i in merge_index if i < self.max_index]
+        merge_index = [i for i in merge_index if i < self.max_index - 1]
         if len(merge_index) < 2:
             return *(gr.skip() for _ in range(batch_size * 3 + 1)), *(gr.Checkbox(False) for _ in range(batch_size))
         else:
@@ -209,7 +211,7 @@ class Subfix:
         self.batch_size = batch_size
         for i in range(index, index + batch_size):
             with gr.Row(equal_height=True):
-                if i <= self.max_index:
+                if i <= self.max_index - 1:
                     with gr.Column(scale=2, min_width=160):
                         textbox_tmp = gr.Textbox(
                             value=self.transcriptions_list[i][3],
@@ -509,7 +511,7 @@ def main(list_path: str = "", i18n_lang="Auto", port=9871, share=False):
 
         timer.tick(
             fn=lambda: (
-                gr.Slider(maximum=subfix.max_index),
+                gr.Slider(value=0, maximum=subfix.max_index),
                 gr.Slider(value=10),
                 gr.Timer(active=False),
             ),
