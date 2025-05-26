@@ -507,28 +507,37 @@ def main(list_path: str = "", i18n_lang="Auto", port=9871, share=False):
     with gr.Blocks(analytics_enabled=False) as app:
         subfix = Subfix(I18nAuto(i18n_lang))
         subfix.render(list_path=list_path)
-        timer = gr.Timer(0.1)
+        if subfix.max_index > 0:
+            timer = gr.Timer(0.1)
 
-        timer.tick(
-            fn=lambda: (
-                gr.Slider(value=0, maximum=subfix.max_index),
-                gr.Slider(value=10),
-                gr.Timer(active=False),
-            ),
-            inputs=[],
-            outputs=[
-                subfix.index_slider,
-                subfix.batch_size_slider,
-                timer,
-            ],
+            timer.tick(
+                fn=lambda: (
+                    gr.Slider(value=0, maximum=subfix.max_index),
+                    gr.Slider(value=10),
+                    gr.Timer(active=False),
+                ),
+                inputs=[],
+                outputs=[
+                    subfix.index_slider,
+                    subfix.batch_size_slider,
+                    timer,
+                ],
+            )
+        else:
+            timer = gr.Timer(2)
+
+            timer.tick(
+                fn=lambda x: (_ for _ in ()).throw(gr.Error("Invalid List")) if x is None else None,
+                inputs=[],
+                outputs=[],
+            )
+        app.queue().launch(
+            server_name="0.0.0.0",
+            inbrowser=True,
+            share=share,
+            server_port=port,
+            quiet=False,
         )
-    app.queue().launch(
-        server_name="0.0.0.0",
-        inbrowser=True,
-        share=share,
-        server_port=port,
-        quiet=False,
-    )
 
 
 if __name__ == "__main__":
