@@ -25,8 +25,7 @@ try:
     onnxruntime.preload_dlls()
 except AttributeError:
     pass
-except Exception as e:
-    print(e)
+except Exception as _:
     traceback.print_exc()
 
 warnings.filterwarnings("ignore")
