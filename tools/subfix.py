@@ -280,7 +280,7 @@ class Subfix:
             self.selections.append(selection_tmp)
         with gr.Row(equal_height=True):
             with gr.Column(scale=2, min_width=160):
-                self.close_button = gr.Button(value=i18n("关闭打标WebUI"), variant="stop")
+                self.close_button = gr.Button(value=i18n("保存并关闭打标WebUI"), variant="stop")
             with gr.Column(scale=1, min_width=160):
                 self.previous_index_button2 = gr.Button(value=i18n("上一页"))
             with gr.Column(scale=1, min_width=160):
