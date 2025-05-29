@@ -149,7 +149,6 @@ else
             echo "Installing，Please Wait..."
         fi
     done
-    conda install -c conda-forge -q -y
 fi
 
 echo "Installing ffmpeg and cmake..."
