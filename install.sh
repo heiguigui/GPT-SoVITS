@@ -266,16 +266,31 @@ elif [ "$WORKFLOW" = false ]; then
     exit 1
 fi
 
-echo "Installing Python dependencies from requirements.txt..."
+echo "Installing dependencies from extra-req.txt..."
+if [ -f "extra-req.txt" ]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line_trimmed=$(echo "$line" | xargs)
+        if [[ -n "$line_trimmed" && "$line_trimmed" != \#* ]]; then
+            echo "Installing: $line_trimmed"
+            pip install "$line_trimmed" --no-deps --quiet
+        fi
+    done < extra-req.txt
+else
+    echo "extra-req.txt not found, skipping."
+fi
 
-# 刷新环境
-# Refresh environment
-hash -r
-
-#pip install -r extra-req.txt --no-deps --quiet
-
-
-#pip install -r requirements.txt --quiet
+echo "Installing dependencies from requirements.txt..."
+if [ -f "requirements.txt" ]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line_trimmed=$(echo "$line" | xargs)
+        if [[ -n "$line_trimmed" && "$line_trimmed" != \#* ]]; then
+            echo "Installing: $line_trimmed"
+            pip install "$line_trimmed" --quiet
+        fi
+    done < requirements.txt
+else
+    echo "requirements.txt not found, skipping."
+fi
 
 
 PY_PREFIX=$(python -c "import sys; print(sys.prefix)")
