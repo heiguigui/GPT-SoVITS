@@ -272,9 +272,11 @@ echo "Installing Python dependencies from requirements.txt..."
 # Refresh environment
 hash -r
 
-pip install -r extra-req.txt --no-deps --quiet
+#pip install -r extra-req.txt --no-deps --quiet
 
-pip install -r requirements.txt --quiet
+
+#pip install -r requirements.txt --quiet
+
 
 PY_PREFIX=$(python -c "import sys; print(sys.prefix)")
 PYOPENJTALK_PREFIX=$(python -c "import os, pyopenjtalk; print(os.path.dirname(pyopenjtalk.__file__))")
