@@ -280,7 +280,7 @@ else
 fi
 
 echo "Installing dependencies from requirements.txt..."
-run_pip_quiet -r requirements.txt
+pip install -r requirements.txt --quiet
 
 
 PY_PREFIX=$(python -c "import sys; print(sys.prefix)")
