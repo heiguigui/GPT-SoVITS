@@ -280,17 +280,7 @@ else
 fi
 
 echo "Installing dependencies from requirements.txt..."
-if [ -f "requirements.txt" ]; then
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line_trimmed=$(echo "$line" | xargs)
-        if [[ -n "$line_trimmed" && "$line_trimmed" != \#* ]]; then
-            echo "Installing: $line_trimmed"
-            pip install "$line_trimmed" --quiet
-        fi
-    done < requirements.txt
-else
-    echo "requirements.txt not found, skipping."
-fi
+run_pip_quiet -r requirements.txt
 
 
 PY_PREFIX=$(python -c "import sys; print(sys.prefix)")
